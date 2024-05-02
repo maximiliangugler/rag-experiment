@@ -4,7 +4,6 @@ from langchain_openai import OpenAIEmbeddings
 
 def get_embedding_function_oai():
     embeddings = OpenAIEmbeddings(
-        model="text-embedding-3-small",
-        api_key="sk-"
+        model="text-embedding-3-small"
     )
     return embeddings
