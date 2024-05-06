@@ -26,7 +26,7 @@ class AsyncOllamaEmbedder:
     def embed_query(self, query):
         # Single query synchronous wrapper for asynchronous embedding
         print(get_detailed_instruct(self.instruction, self.query))
-        return self.sync_call(self.async_embed_documents, [get_detailed_instruct(self.instruction, self.query)])[0]
+        return self.sync_call(self.async_embed_documents, [get_detailed_instruct(self.instruction, query)])[0]
 
     async def async_embed_documents(self, texts):
         # Initialize session right before use

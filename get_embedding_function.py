@@ -3,7 +3,7 @@ import aiohttp
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 
 class AsyncOllamaEmbedder:
-    def __init__(self, model='avr/sfr-embedding-mistral:q8_0', base_url='http://localhost:11434'):
+    def __init__(self, model='mxbai-embed-large', base_url='http://localhost:11434'):
         self.sync_embeddings = OllamaEmbeddings(model=model)
         self.base_url = f"{base_url}/api/embeddings"
         self.session = None
@@ -39,6 +39,7 @@ class AsyncOllamaEmbedder:
                 data = await response.json()
                 return data.get('embedding')
             else:
+                data = await response.json()
                 return None  # Handle errors as needed
 
     def sync_call(self, async_func, *args):

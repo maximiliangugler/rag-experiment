@@ -2,6 +2,7 @@ import argparse
 import os
 import shutil
 from langchain.document_loaders.pdf import PyPDFDirectoryLoader
+from langchain_community.document_loaders import DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
 from get_embedding_function import get_embedding_function
@@ -11,7 +12,7 @@ from langchain.vectorstores.chroma import Chroma
 
 CHROMA_PATH = "chroma"
 DATA_PATH = "data"
-
+PDF_PATH =  "pdf"
 
 def main():
 
@@ -23,7 +24,7 @@ def main():
     parser.add_argument("--reset", action="store_true", help="Reset the database.")
     parser.add_argument("--use-openai-embedding", action="store_true", help="Use OpenAI Embedding.")
     args = parser.parse_args()
-    if args.reset:
+    if(args.reset):
         print("✨ Clearing Database")
         clear_database()
     if(args.use_openai_embedding):
@@ -37,15 +38,20 @@ def main():
     chunks = split_documents(documents)
     add_to_chroma(chunks)
 
+    
 
 def load_documents():
-    document_loader = PyPDFDirectoryLoader(DATA_PATH)
-    return document_loader.load()
+    directory_loader = DirectoryLoader(DATA_PATH, recursive=False)
+    documents = directory_loader.load()
+    pdfDirectoryLoader = PyPDFDirectoryLoader(PDF_PATH)
+    pdfDocuments = pdfDirectoryLoader.load()
+    documents.extend(pdfDocuments)
+    return documents
 
 
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
+        chunk_size=1500,
         chunk_overlap=20,
         length_function=len,
         is_separator_regex=False
