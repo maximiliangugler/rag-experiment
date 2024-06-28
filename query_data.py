@@ -1,11 +1,10 @@
 import os
 import argparse
-from langchain.vectorstores.chroma import Chroma
+from langchain_community.vectorstores import Chroma
 from langchain.prompts import ChatPromptTemplate
 from langchain_community.llms.ollama import Ollama
 
 from get_embedding_function import get_embedding_function
-from get_prompt_embedding_sfr import get_embedding_function_sfr
 from get_embedding_function_oai import get_embedding_function_oai
 
 CHROMA_PATH = "chroma"
@@ -22,6 +21,12 @@ Given only the context information above and no other knowledge, answer this qus
 {question}
 """
 
+SYSTEM_PROMPT = """
+You are a helpful assistent that can answer questions based on the context provided. You give short and concise answers that directly adress the asked question.
+Only answer the questions based on the context provided and do not provide any additional information.
+The provided context information consists exclusively of corporate documents and data from the McDonald's corporation.
+If you cannot answer the question based on the context provided, please respond with "I cannot answer this question based on the context provided."
+"""
 
 def main():
 
@@ -40,9 +45,6 @@ def main():
         print("🌐 Using OpenAI Embedding Model")
         ACTIVE_EMBEDDING_FUNCTION = get_embedding_function_oai()
 
-    if args.sfr_embedding:
-        print("✨ Using SFR Embedding")
-        ACTIVE_EMBEDDING_FUNCTION = get_embedding_function_sfr("Given the following query, retrieve relevant passages that answer this question:", query_text)
 
     query_rag(query_text)
 
@@ -72,13 +74,18 @@ def query_rag(query_text: str):
     prompt = prompt_template.format(context=context_text, question=query_text)
     print("PROMPT: ", prompt)
 
-    model = Ollama(model="llama3:8b-instruct-q8_0")
+    model = Ollama(
+        model="llama3:8b-instruct-q8_0",
+        temperature=0.5,
+        # system=SYSTEM_PROMPT
+        )
     print("ℹ️ Generation model is: ", model.model)
     response_text = model.invoke(prompt)
 
     sources = [doc.metadata.get("id", None) for doc, _score in results]
-    formatted_response = f"Response: {response_text}\nSources: {sources}"
+    formatted_response = f"Response: {response_text}"
     print(formatted_response)
+    # print("Sources: ", sources)
     return response_text
 
 

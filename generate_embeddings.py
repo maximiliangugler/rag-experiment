@@ -1,13 +1,13 @@
 import argparse
 import os
 import shutil
-from langchain.document_loaders.pdf import PyPDFDirectoryLoader
+from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
 from get_embedding_function import get_embedding_function
 from get_embedding_function_oai import get_embedding_function_oai
-from langchain.vectorstores.chroma import Chroma
+from langchain_community.vectorstores import Chroma
 
 
 CHROMA_PATH = "chroma"
@@ -23,6 +23,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--reset", action="store_true", help="Reset the database.")
     parser.add_argument("--use-openai-embedding", action="store_true", help="Use OpenAI Embedding.")
+    parser.add_argument("--sfr-embedding", action="store_true", help="Use SFR Embedding.")
     args = parser.parse_args()
     if(args.reset):
         print("✨ Clearing Database")
@@ -52,7 +53,7 @@ def load_documents():
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1500,
-        chunk_overlap=20,
+        chunk_overlap=30,
         length_function=len,
         is_separator_regex=False
     )
