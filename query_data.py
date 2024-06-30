@@ -55,7 +55,7 @@ def query_rag(query_text: str):
 
     # Search the DB.
     results = db.similarity_search_with_score(query_text, k=4)
-     # print(results)
+    print(results)
 
 
     context_texts = []
